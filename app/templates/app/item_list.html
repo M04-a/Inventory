@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Your Items</h2>
+
+<form method="get" class="filter-bar">
+  <input type="text" name="q" placeholder="Search by name or SKU" value="{{ request.GET.q }}">
+
+  <select name="city">
+    <option value="">All cities</option>
+    {% for city in city %}
+      <option value="{{ city }}" {% if request.GET.city == city %}selected{% endif %}>{{ city }}</option>
+    {% endfor %}
+  </select>
+
+  <select name="building">
+    <option value="">All buildings</option>
+    {% for building in building %}
+      <option value="{{ building }}" {% if request.GET.building == building %}selected{% endif %}>{{ building }}</option>
+    {% endfor %}
+  </select>
+
+  <button type="submit" class="btn"><i class="fas fa-filter"></i> Filter</button>
+  <a href="{% url 'export-csv' %}?{{ request.GET.urlencode }}" class="export-btn"><i class="fas fa-download"></i>   Export CSV</a>
+</form>
+
+<ul>
+{% for item in object_list %}
+  <li onclick="window.location='{% url 'item-detail' item.pk %}'">
+    <div>
+      <strong>{{ item.name }}</strong>
+      <span class="item-meta">{{ item.quantity }} pcs · {{ item.city }} · {{ item.building }}</span>
+    </div>
+  </li>
+{% empty %}
+  <li class="empty-state">No items found.</li>
+{% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Inventory Lite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'app/css/styles.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <nav>
+    <a href="{% url 'item-list' %}"><i class="fas fa-list"></i> List</a>
+    <a href="{% url 'item-create' %}"><i class="fas fa-plus"></i> Create</a>
+    <a href="{% url 'map'%}"><i class="fas fa-map"></i> Map </a>
+    {% if user.is_staff %}
+        <a href="{% url 'admin-inventory' %}"><i class="fas fa-city"></i>Cities & buildings</a>
+    {% endif %}
+    <a href="{% url 'delivery-list' %}" class="nav-link {% if request.resolver_match.url_name == 'delivery-list' %}active{% endif %}">
+      <i class="fas fa-shipping-fast"></i>
+      Deliveries
+    </a>
+    {% if user.is_authenticated %}
+    <a href="{% url 'notification-list' %}" class="nav-link {% if request.resolver_match.url_name == 'notification-list' %}active{% endif %}" style="position: relative;">
+      <i class="fas fa-bell"></i>
+      Notifications
+      {% if unread_notifications_count > 0 %}
+      <span class="notification-badge">{{ unread_notifications_count }}</span>
+      {% endif %}
+    </a>
+    {% endif %}
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </form>
+
+      <!-- Low Stock Alert Section -->
+      {% if low_stock_items %}
+      <div class="low-stock-section">
+        <h3><i class="fas fa-exclamation-triangle"></i> Low Stock</h3>
+        <div class="low-stock-table">
+          {% for item in low_stock_items %}
+          <div class="low-stock-item {% if item.quantity < 5 %}critical{% elif item.quantity < 10 %}warning{% endif %}">
+            <div class="item-info">
+              <span class="item-name">{{ item.name }}</span>
+              <span class="item-sku">{{ item.sku }}</span>
+            </div>
+            <span class="item-quantity">{{ item.quantity }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    {% else %}
+      <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
+    {% endif %}
+  </nav>
+
+  <hr>
+  <div class="container">
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div style="max-width: 700px; margin: 2rem auto;">
+  <h2 style="color: #101828; font-size: 24px; font-weight: 700; margin-bottom: 2rem; display: flex; align-items: center;">
+    <i class="fas fa-edit" style="color: #6366f1; margin-right: 0.75rem;"></i>
+    Update Delivery #{{ object.id }}
+  </h2>
+
+  <div style="background: white; border-radius: 16px; padding: 2rem; border: 1px solid #e5e7eb; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+
+    <!-- Item Info (Read-only) -->
+    <div style="background: #f9fafb; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid #e5e7eb;">
+      <h3 style="color: #101828; font-size: 16px; font-weight: 600; margin: 0 0 1rem; display: flex; align-items: center;">
+        <i class="fas fa-box" style="color: #6366f1; margin-right: 0.5rem; font-size: 14px;"></i>
+        Delivery Information
+      </h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <p style="color: #667085; font-size: 12px; margin: 0 0 0.25rem; text-transform: uppercase; letter-spacing: 0.5px;">Item</p>
+          <p style="color: #101828; font-size: 14px; font-weight: 600; margin: 0;">{{ object.item.name }}</p>
+        </div>
+        <div>
+          <p style="color: #667085; font-size: 12px; margin: 0 0 0.25rem; text-transform: uppercase; letter-spacing: 0.5px;">Quantity</p>
+          <p style="color: #101828; font-size: 14px; font-weight: 600; margin: 0;">{{ object.quantity }} pcs</p>
+        </div>
+      </div>
+      <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+        <p style="color: #667085; font-size: 12px; margin: 0 0 0.25rem; text-transform: uppercase; letter-spacing: 0.5px;">Origin</p>
+        <p style="color: #101828; font-size: 14px; margin: 0;">
+          {{ object.from_city }}, {{ object.from_building }}<br>
+          <span style="color: #667085; font-size: 13px;">{{ object.from_address }}</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Update Form -->
+    <form method="post">
+      {% csrf_token %}
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
+        <div>
+          <label for="id_to_city" style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 14px;">
+            <i class="fas fa-city" style="color: #6366f1; margin-right: 0.5rem;"></i>
+            Destination City
+          </label>
+          {{ form.to_city }}
+          {% if form.to_city.errors %}
+            <p style="color: #dc2626; font-size: 13px; margin-top: 0.5rem;">{{ form.to_city.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div>
+          <label for="id_to_building" style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 14px;">
+            <i class="fas fa-building" style="color: #6366f1; margin-right: 0.5rem;"></i>
+            Destination Building
+          </label>
+          {{ form.to_building }}
+          {% if form.to_building.errors %}
+            <p style="color: #dc2626; font-size: 13px; margin-top: 0.5rem;">{{ form.to_building.errors.0 }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label for="id_to_address" style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 14px;">
+          <i class="fas fa-map-marker-alt" style="color: #6366f1; margin-right: 0.5rem;"></i>
+          Destination Address
+        </label>
+        {{ form.to_address }}
+        {% if form.to_address.errors %}
+          <p style="color: #dc2626; font-size: 13px; margin-top: 0.5rem;">{{ form.to_address.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label for="id_status" style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 14px;">
+          <i class="fas fa-info-circle" style="color: #6366f1; margin-right: 0.5rem;"></i>
+          Status
+        </label>
+        {{ form.status }}
+        {% if form.status.errors %}
+          <p style="color: #dc2626; font-size: 13px; margin-top: 0.5rem;">{{ form.status.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      {% if form.non_field_errors %}
+        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+          <p style="color: #991b1b; font-size: 14px; margin: 0;">{{ form.non_field_errors.0 }}</p>
+        </div>
+      {% endif %}
+
+      <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+        <button type="submit" class="btn" style="flex: 1; justify-content: center; background: #6366f1; color: white;">
+          <i class="fas fa-save"></i> Update Delivery
+        </button>
+        <a href="{% url 'delivery-list' %}" class="btn btn-cancel" style="flex: 1; justify-content: center; text-decoration: none;">
+          <i class="fas fa-times"></i> Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Help Info -->
+  <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 1rem 1.25rem; margin-top: 1.5rem; display: flex; align-items: start; gap: 0.75rem;">
+    <i class="fas fa-info-circle" style="color: #0284c7; font-size: 18px; margin-top: 0.125rem;"></i>
+    <div style="color: #075985; font-size: 13px;">
+      <p style="margin: 0 0 0.5rem; font-weight: 600;">Update Guidelines:</p>
+      <ul style="margin: 0; padding-left: 1.25rem;">
+        <li>Add destination details when the delivery location is confirmed</li>
+        <li>Update status to "Finished" when the delivery is complete</li>
+        <li>Cancelled deliveries cannot be updated</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<style>
+  input[type="text"], select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+
+  input[type="text"]:focus, select:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+</style>
+
+{% endblock %}

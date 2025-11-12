@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 450px; margin: 3rem auto; padding: 2rem; background: white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #e5e7eb;">
+  <h2 style="text-align: center; color: #101828; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+    <i class="fas fa-user-plus" style="color: #6366f1;"></i>
+    Create Account
+  </h2>
+  <p style="text-align: center; color: #667085; font-size: 14px; margin-bottom: 2rem;">
+    Sign up to start managing your inventory
+  </p>
+
+  <form method="post">
+    {% csrf_token %}
+    
+    {% if form.non_field_errors %}
+      <div style="background: #fef3f2; border: 1px solid #fecaca; border-radius: 10px; padding: 1rem; margin-bottom: 1.25rem;">
+        <p style="color: #991b1b; font-size: 14px; margin: 0;">{{ form.non_field_errors }}</p>
+      </div>
+    {% endif %}
+
+    {% for field in form %}
+      <div style="margin-bottom: 1.25rem;">
+        <label for="{{ field.id_for_label }}" style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 14px;">
+          {{ field.label }}
+        </label>
+        {{ field }}
+        {% if field.errors %}
+          <p style="color: #dc2626; font-size: 13px; margin-top: 0.5rem;">{{ field.errors.0 }}</p>
+        {% endif %}
+        {% if field.help_text %}
+          <p style="color: #667085; font-size: 12px; margin-top: 0.5rem;">{{ field.help_text }}</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="btn" style="width: 100%; justify-content: center; padding: 0.875rem; font-size: 15px; margin-top: 0.5rem;">
+      <i class="fas fa-user-plus"></i> Sign Up
+    </button>
+  </form>
+
+  <div style="margin-top: 1.5rem; text-align: center; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+    <p style="color: #667085; font-size: 14px; margin: 0;">
+      Already have an account? 
+      <a href="{% url 'login' %}" style="color: #6366f1; font-weight: 600; text-decoration: none;">
+        Sign in
+      </a>
+    </p>
+  </div>
+</div>
+
+<style>
+  input[type="text"], input[type="email"], input[type="password"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+  input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+</style>
+{% endblock %}

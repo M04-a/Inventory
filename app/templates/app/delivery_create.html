@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div style="max-width: 700px; margin: 2rem auto;">
+  <h2 style="color: #101828; font-size: 24px; font-weight: 700; margin-bottom: 2rem; display: flex; align-items: center;">
+    <i class="fas fa-shipping-fast" style="color: #6366f1; margin-right: 0.75rem;"></i>
+    Place Item in Delivery
+  </h2>
+
+  <div style="background: white; border-radius: 16px; padding: 2rem; border: 1px solid #e5e7eb; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Item Selection -->
+      <div style="margin-bottom: 1.5rem;">
+        <label for="id_item" style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 14px;">
+          <i class="fas fa-box" style="color: #6366f1; margin-right: 0.5rem;"></i>
+          {{ form.item.label }}
+        </label>
+        {{ form.item }}
+        {% if form.item.errors %}
+          <p style="color: #dc2626; font-size: 13px; margin-top: 0.5rem;">{{ form.item.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Quantity -->
+      <div style="margin-bottom: 2rem;">
+        <label for="id_quantity" style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 14px;">
+          <i class="fas fa-hashtag" style="color: #6366f1; margin-right: 0.5rem;"></i>
+          {{ form.quantity.label }}
+        </label>
+        {{ form.quantity }}
+        {% if form.quantity.errors %}
+          <p style="color: #dc2626; font-size: 13px; margin-top: 0.5rem;">{{ form.quantity.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Destination Section -->
+      <div style="background: #f9fafb; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #e5e7eb;">
+        <h3 style="color: #101828; font-size: 16px; font-weight: 600; margin: 0 0 1.25rem; display: flex; align-items: center;">
+          <i class="fas fa-map-marked-alt" style="color: #10b981; margin-right: 0.5rem; font-size: 14px;"></i>
+          Destination (Optional)
+        </h3>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
+          <div>
+            <label for="id_to_city" style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 14px;">
+              <i class="fas fa-city" style="color: #6366f1; margin-right: 0.5rem;"></i>
+              {{ form.to_city.label }}
+            </label>
+            {{ form.to_city }}
+            {% if form.to_city.errors %}
+              <p style="color: #dc2626; font-size: 13px; margin-top: 0.5rem;">{{ form.to_city.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <div>
+            <label for="id_to_building" style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 14px;">
+              <i class="fas fa-building" style="color: #6366f1; margin-right: 0.5rem;"></i>
+              {{ form.to_building.label }}
+            </label>
+            {{ form.to_building }}
+            {% if form.to_building.errors %}
+              <p style="color: #dc2626; font-size: 13px; margin-top: 0.5rem;">{{ form.to_building.errors.0 }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div>
+          <label for="id_to_address" style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 14px;">
+            <i class="fas fa-map-marker-alt" style="color: #6366f1; margin-right: 0.5rem;"></i>
+            {{ form.to_address.label }}
+          </label>
+          {{ form.to_address }}
+          {% if form.to_address.errors %}
+            <p style="color: #dc2626; font-size: 13px; margin-top: 0.5rem;">{{ form.to_address.errors.0 }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if form.non_field_errors %}
+        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+          <p style="color: #991b1b; font-size: 14px; margin: 0;">{{ form.non_field_errors.0 }}</p>
+        </div>
+      {% endif %}
+
+      <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+        <button type="submit" class="btn" style="flex: 1; justify-content: center; background: #6366f1; color: white;">
+          <i class="fas fa-truck"></i> Create Delivery
+        </button>
+        <a href="{% url 'item-list' %}" class="btn btn-cancel" style="flex: 1; justify-content: center; text-decoration: none;">
+          <i class="fas fa-times"></i> Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 1rem 1.25rem; margin-top: 1.5rem; display: flex; align-items: start; gap: 0.75rem;">
+    <i class="fas fa-info-circle" style="color: #0284c7; font-size: 18px; margin-top: 0.125rem;"></i>
+    <div style="color: #075985; font-size: 13px;">
+      <p style="margin: 0 0 0.5rem; font-weight: 600;">How it works:</p>
+      <ul style="margin: 0; padding-left: 1.25rem;">
+        <li>Select an item from your inventory and specify quantity</li>
+        <li>Optionally add destination details (can be updated later)</li>
+        <li>The quantity will be removed from your stock immediately</li>
+        <li>Track and manage the delivery in the deliveries page</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<style>
+  select, input[type="number"], input[type="text"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+
+  select:focus, input[type="number"]:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+</style>
+
+{% endblock %}

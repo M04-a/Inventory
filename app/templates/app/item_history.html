@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h2 style="color: #101828; font-size: 24px; font-weight: 700; margin: 0; display: flex; align-items: center;">
+      <i class="fas fa-history" style="color: #6366f1; margin-right: 0.75rem;"></i>
+      Move History for {{ item.name }}
+    </h2>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="{% url 'item-detail' item.pk %}" class="btn" style="text-decoration: none;">
+        <i class="fas fa-arrow-left"></i> Back to Item
+      </a>
+      <a href="{% url 'item-list' %}" class="btn" style="text-decoration: none;">
+        <i class="fas fa-list"></i> All Items
+      </a>
+    </div>
+  </div>
+
+  <!-- Item Info Card -->
+  <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #eaecf0; margin-bottom: 1.5rem;">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <div style="width: 48px; height: 48px; background: #6366f1; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-box" style="color: white; font-size: 20px;"></i>
+      </div>
+      <div>
+        <div style="color: #667085; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem;">
+          Tracking Item
+        </div>
+        <div style="color: #101828; font-size: 18px; font-weight: 700;">
+          {{ item.name }} <span style="color: #667085; font-size: 14px; font-weight: 500;">• SKU: {{ item.sku }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Move History Card -->
+  <div style="background: white; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #eaecf0; overflow: hidden;">
+
+    <!-- Header -->
+    <div style="padding: 1.5rem; border-bottom: 1px solid #eaecf0; background: #f9fafb;">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <i class="fas fa-clock" style="color: #6366f1; font-size: 18px;"></i>
+        <h3 style="color: #101828; font-size: 18px; font-weight: 700; margin: 0;">
+          Movement Timeline
+        </h3>
+        <span style="background: #e0e7ff; color: #4338ca; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 12px; font-weight: 600;">
+          {{ moves|length }} {% if moves|length == 1 %}move{% else %}moves{% endif %}
+        </span>
+      </div>
+    </div>
+
+    <!-- Table Content -->
+    {% if moves %}
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+            <th style="padding: 1rem 1.5rem; text-align: left; color: #667085; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+              <i class="fas fa-map-marker-alt" style="margin-right: 0.5rem; color: #6366f1;"></i>
+              From Location
+            </th>
+            <th style="padding: 1rem 1.5rem; text-align: center; color: #667085; font-size: 12px; font-weight: 600;">
+              <i class="fas fa-arrow-right" style="color: #6366f1;"></i>
+            </th>
+            <th style="padding: 1rem 1.5rem; text-align: left; color: #667085; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+              <i class="fas fa-map-marker-alt" style="margin-right: 0.5rem; color: #10b981;"></i>
+              To Location
+            </th>
+            <th style="padding: 1rem 1.5rem; text-align: left; color: #667085; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+              <i class="fas fa-calendar" style="margin-right: 0.5rem; color: #6366f1;"></i>
+              Date & Time
+            </th>
+            <th style="padding: 1rem 1.5rem; text-align: left; color: #667085; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+              <i class="fas fa-user" style="margin-right: 0.5rem; color: #6366f1;"></i>
+              Moved By
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for move in moves %}
+          <tr style="border-bottom: 1px solid #eaecf0; transition: background-color 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+            <!-- From Location -->
+            <td style="padding: 1.25rem 1.5rem;">
+              <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                <div style="color: #101828; font-size: 15px; font-weight: 600;">
+                  {{ move.from_city }}
+                </div>
+                <div style="color: #667085; font-size: 13px;">
+                  <i class="fas fa-building" style="margin-right: 0.35rem; font-size: 11px;"></i>
+                  {{ move.from_building }}
+                </div>
+              </div>
+            </td>
+
+            <!-- Arrow -->
+            <td style="padding: 1.25rem 1.5rem; text-align: center;">
+              <div style="display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-arrow-right" style="color: #6366f1; font-size: 16px;"></i>
+              </div>
+            </td>
+
+            <!-- To Location -->
+            <td style="padding: 1.25rem 1.5rem;">
+              <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                <div style="color: #101828; font-size: 15px; font-weight: 600;">
+                  {{ move.to_city }}
+                </div>
+                <div style="color: #667085; font-size: 13px;">
+                  <i class="fas fa-building" style="margin-right: 0.35rem; font-size: 11px;"></i>
+                  {{ move.to_building }}
+                </div>
+              </div>
+            </td>
+
+            <!-- Date & Time -->
+            <td style="padding: 1.25rem 1.5rem;">
+              <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                <div style="color: #101828; font-size: 14px; font-weight: 600;">
+                  {{ move.moved_at|date:"M d, Y" }}
+                </div>
+                <div style="color: #667085; font-size: 13px;">
+                  <i class="fas fa-clock" style="margin-right: 0.35rem; font-size: 11px;"></i>
+                  {{ move.moved_at|date:"H:i" }}
+                </div>
+              </div>
+            </td>
+
+            <!-- Moved By -->
+            <td style="padding: 1.25rem 1.5rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div style="width: 32px; height: 32px;  border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+
+                </div>
+                <span style="color: #101828; font-size: 14px; font-weight: 600;">
+                  {{ move.moved_by }}
+                </span>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div style="padding: 4rem 2rem; text-align: center;">
+      <div style="width: 80px; height: 80px; background: #f3f4f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+        <i class="fas fa-history" style="color: #9ca3af; font-size: 32px;"></i>
+      </div>
+      <h4 style="color: #101828; font-size: 18px; font-weight: 700; margin: 0 0 0.5rem;">
+        No Move History
+      </h4>
+      <p style="color: #667085; font-size: 14px; margin: 0;">
+        This item hasn't been moved yet. All future movements will be tracked here.
+      </p>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Products Map</h2>
+
+<!-- Search & Filter Bar -->
+<form method="get" class="filter-bar">
+  <div>
+    <label for="q">Search (name / SKU)</label>
+    <input type="text" id="q" name="q" value="{{ q }}" placeholder="Search product..." />
+  </div>
+  <div>
+    <label for="city">City</label>
+    <select id="city" name="city">
+      <option value="">All cities</option>
+      {% for c in cities %}
+        <option value="{{ c }}" {% if sel_city == c %}selected{% endif %}>{{ c }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label for="building">Building</label>
+    <select id="building" name="building">
+      <option value="">All buildings</option>
+      {% for b in buildings %}
+        <option value="{{ b }}" {% if sel_building == b %}selected{% endif %}>{{ b }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div style="display: flex; align-items: flex-end;">
+    <button type="submit"><i class="fas fa-filter"></i>Apply filters</button>
+  </div>
+</form>
+
+<!-- Alert for missing API Key -->
+{% if not has_key %}
+  <div style="background: #fef3f2; border: 1px solid #fecaca; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.75rem;">
+    <i class="fas fa-exclamation-triangle" style="color: #dc2626; font-size: 18px; margin: 0;"></i>
+    <span style="color: #991b1b; font-size: 14px; font-weight: 500;">GOOGLE_MAPS_API_KEY is missing in configuration.</span>
+  </div>
+{% endif %}
+
+<!-- Map and Products Side by Side Layout -->
+<div style="display: grid; grid-template-columns: 500px 1fr; gap: 1.25rem; align-items: start;">
+
+  <!-- Left Column: Map Display -->
+  <div>
+    {% if map_urls %}
+      <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #eaecf0; position: sticky; top: 2rem;">
+        <h3 style="color: #101828; font-size: 16px; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center;">
+          <i class="fas fa-map-marked-alt" style="color: #6366f1; margin-right: 0.5rem;"></i>
+          Map view
+        </h3>
+
+        {% for url in map_urls %}
+          <div style="margin-bottom: {% if forloop.last %}0{% else %}1.25rem{% endif %};">
+            <img src="{{ url }}" alt="Products map {{ forloop.counter }}"
+                 style="width: 100%; height: auto; border-radius: 8px; border: 1px solid #eaecf0; box-shadow: 0 2px 4px rgba(0,0,0,0.06);" />
+            {% if map_urls|length > 1 %}
+              <p style="color: #667085; font-size: 13px; margin-top: 0.5rem; text-align: center;">
+                Map {{ forloop.counter }} of {{ map_urls|length }}
+              </p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="background: white; border-radius: 12px; padding: 3rem 2rem; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #eaecf0;">
+        <i class="fas fa-map" style="color: #d0d5dd; font-size: 48px; margin-bottom: 1rem;"></i>
+        <p style="color: #98a2b3; font-size: 14px; margin: 0;">No products with coordinates for the current filters.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Right Column: Products List -->
+  <div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h3 style="color: #101828; font-size: 18px; font-weight: 600; margin: 0;">
+        <i class="fas fa-list"></i>
+        Product list
+        {% if items %}
+          <span style="color: #667085; font-weight: 400; font-size: 14px; margin-left: 0.5rem;">
+            ({{ items|length }} {% if items|length == 1 %}product{% else %}products{% endif %})
+          </span>
+        {% endif %}
+      </h3>
+    </div>
+
+    {% if items %}
+      <table>
+        <thead>
+          <tr>
+            <th><i class="fas fa-tag"></i>Name</th>
+            <th><i class="fas fa-barcode"></i>SKU</th>
+            <th><i class="fas fa-boxes"></i>Quantity</th>
+            <th><i class="fas fa-city"></i>City</th>
+            <th><i class="fas fa-building"></i>Building</th>
+            <th><i class="fas fa-map-marker-alt"></i>Address</th>
+            <th><i class="fas fa-cog"></i>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for it in items %}
+            <tr>
+              <td style="font-weight: 500; color: #101828;">{{ it.name }}</td>
+              <td style="font-family: 'Courier New', monospace; color: #667085;">{{ it.sku }}</td>
+              <td>
+                {% if it.quantity < low_stock_threshold %}
+                  <span class="low-stock">
+                    <i class="fas fa-exclamation-circle" style="margin-right: 0.25rem;"></i>
+                    {{ it.quantity }}
+                  </span>
+                {% else %}
+                  <span style="background: #ecfdf5; color: #059669; padding: 0.125rem 0.625rem; border-radius: 6px; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center;">
+                    <i class="fas fa-check-circle" style="margin-right: 0.25rem; font-size: 11px;"></i>
+                    {{ it.quantity }}
+                  </span>
+                {% endif %}
+              </td>
+              <td>{{ it.city }}</td>
+              <td>{{ it.building }}</td>
+              <td style="color: #667085; font-size: 13px;">{{ it.address }}</td>
+              <td>
+                <a href="{% url 'item-detail' it.id %}" class="btn" style="padding: 0.5rem 0.875rem; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center;">
+                  <i class="fas fa-eye"></i>
+                  Details
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div style="background: white; border-radius: 12px; padding: 3rem 2rem; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #eaecf0;">
+        <i class="fas fa-box-open" style="color: #d0d5dd; font-size: 48px; margin-bottom: 1rem;"></i>
+        <p style="color: #98a2b3; font-size: 14px; margin: 0;">No products available.</p>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+{% endblock %}

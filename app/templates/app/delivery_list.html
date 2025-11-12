@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h2 style="color: #101828; font-size: 24px; font-weight: 700; margin: 0; display: flex; align-items: center;">
+      <i class="fas fa-shipping-fast" style="color: #6366f1; margin-right: 0.75rem;"></i>
+      My Deliveries
+    </h2>
+    <a href="{% url 'delivery-create' %}" class="btn" style="text-decoration: none;">
+      <i class="fas fa-plus-circle"></i>
+      New Delivery
+    </a>
+  </div>
+
+  <!-- Search & Filter Bar -->
+  <form method="get" class="filter-bar">
+    <div>
+      <label for="q">Search by item name</label>
+      <input type="text" id="q" name="q" value="{{ request.GET.q }}" placeholder="Search deliveries..." />
+    </div>
+    <div>
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="">All statuses</option>
+        {% for value, label in status_choices %}
+          <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="display: flex; align-items: flex-end;">
+      <button type="submit"><i class="fas fa-filter"></i> Apply filters</button>
+    </div>
+  </form>
+</div>
+
+<!-- Deliveries List -->
+{% if deliveries %}
+  <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #eaecf0;">
+    <table style="margin: 0; box-shadow: none; border: none;">
+      <thead>
+        <tr>
+          <th><i class="fas fa-hashtag"></i> ID</th>
+          <th><i class="fas fa-box"></i> Item</th>
+          <th><i class="fas fa-sort-amount-down"></i> Quantity</th>
+          <th><i class="fas fa-map-marker-alt"></i> From</th>
+          <th><i class="fas fa-info-circle"></i> Status</th>
+          <th><i class="fas fa-calendar"></i> Created</th>
+          <th><i class="fas fa-cog"></i> Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for delivery in deliveries %}
+          <tr>
+            <td style="font-family: 'Courier New', monospace; color: #667085; font-weight: 600;">#{{ delivery.id }}</td>
+            <td style="font-weight: 500; color: #101828;">{{ delivery.item.name }}</td>
+            <td>
+              <span style="background: #f0f9ff; color: #0284c7; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 13px; font-weight: 600;">
+                {{ delivery.quantity }} pcs
+              </span>
+            </td>
+            <td style="color: #667085; font-size: 13px;">
+              {{ delivery.from_city }}, {{ delivery.from_building }}
+            </td>
+            <td>
+              {% if delivery.status == 'in_progress' %}
+                <span style="background: #fef3c7; color: #92400e; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center;">
+                  <i class="fas fa-clock" style="margin-right: 0.375rem; font-size: 11px;"></i>
+                  In Progress
+                </span>
+              {% elif delivery.status == 'finished' %}
+                <span style="background: #dcfce7; color: #166534; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center;">
+                  <i class="fas fa-check-circle" style="margin-right: 0.375rem; font-size: 11px;"></i>
+                  Finished
+                </span>
+              {% else %}
+                <span style="background: #fee2e2; color: #991b1b; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center;">
+                  <i class="fas fa-times-circle" style="margin-right: 0.375rem; font-size: 11px;"></i>
+                  Cancelled
+                </span>
+              {% endif %}
+            </td>
+            <td style="color: #667085; font-size: 13px;">{{ delivery.created_at|date:"Y-m-d H:i" }}</td>
+            <td>
+              <a href="{% url 'delivery-detail' delivery.id %}" class="btn" style="padding: 0.5rem 0.875rem; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center;">
+                  <i class="fas fa-eye"></i>
+                  View
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div style="background: white; border-radius: 12px; padding: 3rem 2rem; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #eaecf0;">
+    <i class="fas fa-truck" style="color: #d0d5dd; font-size: 48px; margin-bottom: 1rem;"></i>
+    <p style="color: #98a2b3; font-size: 14px; margin: 0 0 1.5rem;">No deliveries found.</p>
+    <a href="{% url 'delivery-create' %}" class="btn" style="text-decoration: none;">
+      <i class="fas fa-plus-circle"></i>
+      Create First Delivery
+    </a>
+  </div>
+{% endif %}
+
+{% endblock %}

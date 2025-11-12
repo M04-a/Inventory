@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="card">
+    <h2>Login</h2>
+    <form method="post">{% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i> Log in</button>
+    </form>
+  </div>
+  <div style="margin-top: 1.5rem; text-align: center; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+    <p style="color: #667085; font-size: 14px; margin: 0;">
+      Don't have an account?
+      <a href="{% url 'register' %}" style="color: #6366f1; font-weight: 600; text-decoration: none;">
+        Sign up here
+      </a>
+    </p>
+</div>
+{% endblock %}

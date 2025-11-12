@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Move Item: {{ object.name }}</h2>
+
+  <!-- Step 1: Choose city to load buildings -->
+  <form method="get" id="cityForm" style="margin-bottom:1rem;">
+    <label for="pref_city"><strong>Select City</strong></label>
+    <select id="pref_city" name="city">
+      <option value="">— choose city —</option>
+      {% for c in cities %}
+        <option value="{{ c.id }}"
+          {% if request.GET.city == c.id|stringformat:"s" %}selected{% endif %}>
+          {{ c.name }}
+        </option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn">Load buildings</button>
+  </form>
+
+  <!-- Step 2: Full form with filtered buildings -->
+  <form method="post" id="moveForm">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary"><i class="fas fa-truck"></i> Move Item</button>
+  </form>
+
+  <a href="{% url 'item-list' %}" class="btn btn-cancel"><i class="fas fa-arrow-left"></i> Back to list</a>
+
+  <script>
+    // Find and hide the city field in the POST form
+    const moveForm = document.getElementById('moveForm');
+    const allSelects = moveForm.querySelectorAll('select');
+
+    allSelects.forEach(select => {
+      // The first select in the form is the city dropdown (before building)
+      if (select.name.toLowerCase().includes('city')) {
+        select.closest('p').style.display = 'none';
+      }
+    });
+
+    // Sync city selection from GET form to POST form
+    const prefCity = document.getElementById('pref_city');
+    const cityFieldInForm = moveForm.querySelector('select[name="city"]');
+
+    if (prefCity && cityFieldInForm) {
+      prefCity.addEventListener('change', function() {
+        cityFieldInForm.value = this.value;
+      });
+
+      // Set initial value if city is already selected
+      if (prefCity.value) {
+        cityFieldInForm.value = prefCity.value;
+      }
+    }
+  </script>
+{% endblock %}

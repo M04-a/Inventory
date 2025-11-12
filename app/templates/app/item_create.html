@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Add Item</h2>
+
+  <!-- Step 1: Choose city to load buildings -->
+  <form method="get" id="cityForm" style="margin-bottom:1rem;">
+    <label for="pref_city"><strong>Select City</strong></label>
+    <select id="pref_city" name="city">
+      <option value="">— choose city —</option>
+      {% for c in form.fields.city.queryset %}
+        <option value="{{ c.id }}"
+          {% if form.initial.city == c.id or request.GET.city == c.id|stringformat:"s" %}selected{% endif %}>
+          {{ c.name }}
+        </option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn">Load buildings</button>
+  </form>
+
+  <!-- Step 2: Full form with filtered buildings -->
+  <form method="post" id="createForm">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn"><i class="fas fa-save"></i> Save</button>
+    <a href="{% url 'item-list' %}" class="btn btn-cancel"><i class="fas fa-times"></i> Cancel</a>
+  </form>
+
+  <script>
+    // Hide the city field in the POST form
+    const createForm = document.getElementById('createForm');
+    const allSelects = createForm.querySelectorAll('select');
+
+    allSelects.forEach(select => {
+      if (select.name.toLowerCase().includes('city')) {
+        select.closest('p').style.display = 'none';
+      }
+    });
+
+    // Sync city selection from GET form to POST form
+    const prefCity = document.getElementById('pref_city');
+    const cityFieldInForm = createForm.querySelector('select[name="city"]');
+
+    if (prefCity && cityFieldInForm) {
+      prefCity.addEventListener('change', function() {
+        cityFieldInForm.value = this.value;
+      });
+
+      // Set initial value if city is already selected
+      if (prefCity.value) {
+        cityFieldInForm.value = prefCity.value;
+      }
+    }
+  </script>
+{% endblock %}

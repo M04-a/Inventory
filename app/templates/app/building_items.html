@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="margin-bottom:2.5rem;">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+    <div>
+      <div style="display:flex; align-items:center; gap:.5rem; margin-bottom:.5rem;">
+        <a href="{% url 'admin-inventory' %}?city={{ building.city.id }}" style="color:#6366f1; text-decoration:none; font-size:14px; font-weight:500;">
+          <i class="fas fa-arrow-left"></i> Back to Cities & Buildings
+        </a>
+      </div>
+      <h2 style="display:flex; align-items:center; gap:.75rem; margin:0;">
+        <i class="fas fa-warehouse" style="color:#6366f1;"></i>
+        {{ building.name }}
+      </h2>
+      <p style="color:#667085; font-size:14px; margin:.5rem 0 0;">
+        <i class="fas fa-map-marker-alt" style="color:#6366f1; margin-right:.25rem;"></i>
+        {{ building.city.name }} • {{ building.address }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Stats cards -->
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:1.5rem; margin-top:1.5rem;">
+    <div style="background:white; border-radius:16px; padding:1.5rem; border:1px solid #e5e7eb; box-shadow:0 4px 12px rgba(0,0,0,0.06);">
+      <div style="display:flex; justify-content:space-between; align-items:start;">
+        <div>
+          <p style="color:#667085; font-size:13px; font-weight:500; margin:0 0 .5rem; text-transform:uppercase; letter-spacing:0.5px;">Total Items</p>
+          <p style="color:#101828; font-size:32px; font-weight:700; margin:0;">{{ total_items }}</p>
+        </div>
+        <div style="width:48px; height:48px; background:#eff6ff; border-radius:12px; display:flex; align-items:center; justify-content:center;">
+          <i class="fas fa-boxes" style="color:#6366f1; font-size:20px;"></i>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:white; border-radius:16px; padding:1.5rem; border:1px solid #e5e7eb; box-shadow:0 4px 12px rgba(0,0,0,0.06);">
+      <div style="display:flex; justify-content:space-between; align-items:start;">
+        <div>
+          <p style="color:#667085; font-size:13px; font-weight:500; margin:0 0 .5rem; text-transform:uppercase; letter-spacing:0.5px;">Total Quantity</p>
+          <p style="color:#101828; font-size:32px; font-weight:700; margin:0;">{{ total_quantity }}</p>
+        </div>
+        <div style="width:48px; height:48px; background:#f0fdf4; border-radius:12px; display:flex; align-items:center; justify-content:center;">
+          <i class="fas fa-layer-group" style="color:#10b981; font-size:20px;"></i>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:white; border-radius:16px; padding:1.5rem; border:1px solid #e5e7eb; box-shadow:0 4px 12px rgba(0,0,0,0.06);">
+      <div style="display:flex; justify-content:space-between; align-items:start;">
+        <div>
+          <p style="color:#667085; font-size:13px; font-weight:500; margin:0 0 .5rem; text-transform:uppercase; letter-spacing:0.5px;">Location</p>
+          <p style="color:#101828; font-size:16px; font-weight:600; margin:0;">{{ building.city.name }}</p>
+          <p style="color:#667085; font-size:13px; margin:.25rem 0 0;">{{ building.address }}</p>
+        </div>
+        <div style="width:48px; height:48px; background:#fef3f2; border-radius:12px; display:flex; align-items:center; justify-content:center;">
+          <i class="fas fa-map-marker-alt" style="color:#dc2626; font-size:20px;"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Items list -->
+<div style="background:white; border-radius:16px; padding:1.75rem; box-shadow:0 4px 12px rgba(0,0,0,0.06); border:1px solid #e5e7eb;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+    <div>
+      <h3 style="color:#101828; font-size:17px; font-weight:600; margin:0; display:flex; align-items:center;">
+        <i class="fas fa-box" style="color:#6366f1; margin-right:.65rem; font-size:18px;"></i>
+        Items in {{ building.name }}
+      </h3>
+    </div>
+  </div>
+
+  {% if items %}
+    <div style="overflow-x:auto; border-radius:12px; border:1px solid #e5e7eb;">
+      <table style="margin:0; box-shadow:none; border:none;">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>SKU</th>
+            <th>Owner</th>
+            <th>Quantity</th>
+            <th>Created At</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+            <tr>
+              <td style="font-weight:600; color:#101828;">
+                <i class="fas fa-box" style="color:#6366f1; margin-right:.5rem; font-size:14px;"></i>
+                {{ item.name }}
+              </td>
+              <td style="font-family:monospace; color:#6b7280; font-size:13px;">{{ item.sku }}</td>
+              <td style="color:#667085; font-size:13px;">
+                <i class="fas fa-user" style="margin-right:.25rem; font-size:12px;"></i>
+                {{ item.owner.username }}
+              </td>
+              <td>
+                {% if item.quantity < 10 %}
+                  <span style="background:#fef3f2; color:#dc2626; padding:.35rem .75rem; border-radius:8px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:.35rem;">
+                    <i class="fas fa-exclamation-triangle" style="font-size:11px;"></i>
+                    {{ item.quantity }}
+                  </span>
+                {% else %}
+                  <span style="background:#f0fdf4; color:#10b981; padding:.35rem .75rem; border-radius:8px; font-weight:600; font-size:13px;">
+                    {{ item.quantity }}
+                  </span>
+                {% endif %}
+              </td>
+              <td style="color:#667085; font-size:13px;">
+                <i class="fas fa-calendar" style="margin-right:.25rem; font-size:12px;"></i>
+                {{ item.created_at|date:"Y-m-d H:i" }}
+              </td>
+              <td>
+                <a href="{% url 'item-detail' item.pk %}" class="btn" style="padding:.5rem 1rem; font-size:13px;">
+                  <i class="fas fa-eye"></i> View
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+      <div style="display:flex; justify-content:center; align-items:center; gap:1rem; margin-top:2rem;">
+        {% if page_obj.has_previous %}
+          <a href="?page=1" class="btn" style="padding:.5rem 1rem;">
+            <i class="fas fa-angle-double-left"></i>
+          </a>
+          <a href="?page={{ page_obj.previous_page_number }}" class="btn" style="padding:.5rem 1rem;">
+            <i class="fas fa-angle-left"></i>
+          </a>
+        {% endif %}
+
+        <span style="color:#667085; font-size:14px; font-weight:500;">
+          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="btn" style="padding:.5rem 1rem;">
+            <i class="fas fa-angle-right"></i>
+          </a>
+          <a href="?page={{ page_obj.paginator.num_pages }}" class="btn" style="padding:.5rem 1rem;">
+            <i class="fas fa-angle-double-right"></i>
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+  {% else %}
+    <div style="background:#f9fafb; border-radius:12px; padding:3rem 2rem; text-align:center; border:1px dashed #d1d5db;">
+      <i class="fas fa-box-open" style="color:#d1d5db; font-size:48px; margin-bottom:1rem;"></i>
+      <p style="color:#6b7280; font-size:14px; margin:0;">No items found in this building</p>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}
+

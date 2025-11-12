@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h2 style="color: #101828; font-size: 24px; font-weight: 700; margin: 0; display: flex; align-items: center;">
+      <i class="fas fa-box" style="color: #6366f1; margin-right: 0.75rem;"></i>
+      {{ object.name }}
+    </h2>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="{% url 'item-update' object.pk %}" class="btn" style="text-decoration: none;">
+        <i class="fas fa-edit"></i> Edit
+      </a>
+      <a href="{% url 'item-move' object.pk %}" class="btn" style="text-decoration: none;">
+        <i class="fas fa-exchange-alt"></i> Move
+      </a>
+      <a href="{% url 'item-history' object.pk %}" class="btn" style="text-decoration: none;">
+        <i class="fas fa-history"></i> History
+      </a>
+      <a href="{% url 'item-delete' object.pk %}" class="btn" style="text-decoration: none; color: #dc2626;">
+        <i class="fas fa-trash"></i> Delete
+      </a>
+    </div>
+  </div>
+
+  <!-- Item Details Card -->
+  <div style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #eaecf0;">
+
+    <!-- Info Grid -->
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+
+      <!-- ID -->
+      <div style="padding: 1rem; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+        <div style="color: #667085; font-size: 13px; font-weight: 500; margin-bottom: 0.5rem; display: flex; align-items: center;">
+          <i class="fas fa-hashtag" style="margin-right: 0.5rem; color: #6366f1;"></i>
+          ID
+        </div>
+        <div style="color: #101828; font-size: 16px; font-weight: 600; font-family: 'Courier New', monospace;">
+          #{{ object.pk }}
+        </div>
+      </div>
+
+      <!-- SKU -->
+      <div style="padding: 1rem; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+        <div style="color: #667085; font-size: 13px; font-weight: 500; margin-bottom: 0.5rem; display: flex; align-items: center;">
+          <i class="fas fa-barcode" style="margin-right: 0.5rem; color: #6366f1;"></i>
+          SKU
+        </div>
+        <div style="color: #101828; font-size: 16px; font-weight: 600;">
+          {{ object.sku }}
+        </div>
+      </div>
+
+      <!-- Quantity -->
+      <div style="padding: 1rem; background: #f0f9ff; border-radius: 8px; border: 1px solid #bae6fd;">
+        <div style="color: #0284c7; font-size: 13px; font-weight: 500; margin-bottom: 0.5rem; display: flex; align-items: center;">
+          <i class="fas fa-sort-amount-down" style="margin-right: 0.5rem;"></i>
+          Quantity
+        </div>
+        <div style="color: #0c4a6e; font-size: 20px; font-weight: 700;">
+          {{ object.quantity }} <span style="font-size: 14px; font-weight: 500;">pcs</span>
+        </div>
+      </div>
+
+      <!-- City -->
+      <div style="padding: 1rem; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+        <div style="color: #667085; font-size: 13px; font-weight: 500; margin-bottom: 0.5rem; display: flex; align-items: center;">
+          <i class="fas fa-city" style="margin-right: 0.5rem; color: #6366f1;"></i>
+          City
+        </div>
+        <div style="color: #101828; font-size: 16px; font-weight: 600;">
+          {{ object.city }}
+        </div>
+      </div>
+
+      <!-- Building -->
+      <div style="padding: 1rem; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+        <div style="color: #667085; font-size: 13px; font-weight: 500; margin-bottom: 0.5rem; display: flex; align-items: center;">
+          <i class="fas fa-building" style="margin-right: 0.5rem; color: #6366f1;"></i>
+          Building
+        </div>
+        <div style="color: #101828; font-size: 16px; font-weight: 600;">
+          {{ object.building }}
+        </div>
+      </div>
+
+      <!-- Address -->
+      <div style="padding: 1rem; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+        <div style="color: #667085; font-size: 13px; font-weight: 500; margin-bottom: 0.5rem; display: flex; align-items: center;">
+          <i class="fas fa-map-marker-alt" style="margin-right: 0.5rem; color: #6366f1;"></i>
+          Address
+        </div>
+        <div style="color: #101828; font-size: 16px; font-weight: 600;">
+          {{ object.address }}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Location Summary -->
+    <div style="padding: 1.5rem; background: #f0f9ff; border-radius: 8px; border: 1px solid #bae6fd; margin-top: 1rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div style="width: 48px; height: 48px; background: #0284c7; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-map-marked-alt" style="color: white; font-size: 20px;"></i>
+        </div>
+        <div>
+          <div style="color: #0284c7; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem;">
+            Current Location
+          </div>
+          <div style="color: #0c4a6e; font-size: 18px; font-weight: 700;">
+            {{ object.city }} - {{ object.building }}
+          </div>
+          <div style="color: #0369a1; font-size: 14px; margin-top: 0.25rem;">
+            {{ object.address }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

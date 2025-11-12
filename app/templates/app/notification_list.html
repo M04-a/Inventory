@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+  <h2><i class="fas fa-bell"></i> Notifications</h2>
+  <div style="display: flex; gap: 0.5rem;">
+    <a href="{% url 'notification-settings' %}" class="btn" style="text-decoration: none;">
+      <i class="fas fa-cog"></i> Settings
+    </a>
+    {% if unread_count > 0 %}
+    <a href="{% url 'notification-mark-all-read' %}" class="btn" style="text-decoration: none;">
+      <i class="fas fa-check-double"></i> Mark All Read
+    </a>
+    {% endif %}
+    <form method="post" action="{% url 'notification-clear-all' %}" style="display: inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn" onclick="return confirm('Delete all read notifications?')">
+        <i class="fas fa-trash"></i> Clear Read
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="notification-stats">
+  <div class="stat">
+    <div class="stat-value">{{ total_count }}</div>
+    <div class="stat-label">Total</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value" style="color: #6366f1;">{{ unread_count }}</div>
+    <div class="stat-label">Unread</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value" style="color: #10b981;">{{ read_count }}</div>
+    <div class="stat-label">Read</div>
+  </div>
+</div>
+
+<!-- Filters -->
+<form method="get" class="notification-filters">
+  <select name="status" onchange="this.form.submit()">
+    <option value="">All Notifications</option>
+    <option value="unread" {% if request.GET.status == 'unread' %}selected{% endif %}>Unread Only</option>
+    <option value="read" {% if request.GET.status == 'read' %}selected{% endif %}>Read Only</option>
+  </select>
+
+  <select name="type" onchange="this.form.submit()">
+    <option value="">All Types</option>
+    {% for type_val, type_label in notification_types %}
+    <option value="{{ type_val }}" {% if request.GET.type == type_val %}selected{% endif %}>{{ type_label }}</option>
+    {% endfor %}
+  </select>
+
+  {% if request.GET.status or request.GET.type %}
+  <a href="{% url 'notification-list' %}" class="btn">Clear Filters</a>
+  {% endif %}
+</form>
+
+<!-- Notifications List - ACCORDION WITH BORDERS -->
+{% if notifications %}
+  <div style="padding: 0.5rem 0;">
+  {% for notification in notifications %}
+  <div class="notification-accordion {% if not notification.is_read %}unread{% endif %}" style="margin-bottom: 1.5rem;">
+
+    <!-- HEADER - Always Visible (Click to Expand) -->
+    <div class="notification-accordion-header" onclick="toggleNotification({{ notification.pk }})" style="cursor: pointer;">
+      <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+
+        <!-- Icon + Title -->
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1;">
+          <!-- Icon based on type -->
+          <div class="notification-icon {{ notification.type }}">
+            {% if notification.type == 'low_stock' %}
+              <i class="fas fa-exclamation-triangle"></i>
+            {% elif notification.type == 'delivery_created' %}
+              <i class="fas fa-truck"></i>
+            {% elif notification.type == 'delivery_finished' %}
+              <i class="fas fa-check-circle"></i>
+            {% elif notification.type == 'delivery_cancelled' %}
+              <i class="fas fa-times-circle"></i>
+            {% elif notification.type == 'item_moved' %}
+              <i class="fas fa-exchange-alt"></i>
+            {% endif %}
+          </div>
+
+          <!-- TITLE (Type Display) -->
+          <div style="flex: 1;">
+            <h3 class="notification-accordion-title">{{ notification.get_type_display }}</h3>
+            <span class="notification-time">
+              <i class="fas fa-clock"></i> {{ notification.created_at|timesince }} ago
+            </span>
+          </div>
+        </div>
+
+        <!-- Expand/Collapse Icon -->
+        <div class="notification-toggle-icon" id="toggle-icon-{{ notification.pk }}">
+          <i class="fas fa-chevron-down"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT - Collapsible (Initially Hidden) -->
+    <div class="notification-accordion-content" id="notification-content-{{ notification.pk }}" style="display: none;">
+      <div style="padding: 1.25rem; background: #fafafa; border: 3px solid #e5e7eb; border-radius: 8px; margin: 0.75rem;">
+
+        <!-- Detailed Title -->
+        <h4 style="color: #101828; font-size: 15px; font-weight: 600; margin-bottom: 0.75rem;">
+          {{ notification.title }}
+        </h4>
+
+        <!-- Message -->
+        <div class="notification-message" style="margin-bottom: 1.25rem; color: #667085; line-height: 1.6;">
+          {{ notification.message }}
+        </div>
+
+        <!-- Actions -->
+        <div class="notification-actions" style="display: flex; gap: 0.625rem; flex-wrap: wrap; padding-top: 1rem; border-top: 2px solid #d1d5db;">
+          {% if notification.item %}
+          <a href="{% url 'item-detail' notification.item.pk %}" class="btn-primary" style="text-decoration: none;">
+            <i class="fas fa-eye"></i> View Item
+          </a>
+          {% endif %}
+
+          {% if notification.delivery %}
+          <a href="{% url 'delivery-detail' notification.delivery.pk %}" class="btn-primary" style="text-decoration: none;">
+            <i class="fas fa-truck"></i> View Delivery
+          </a>
+          {% endif %}
+
+          {% if not notification.is_read %}
+          <a href="{% url 'notification-mark-read' notification.pk %}" style="text-decoration: none;">
+            <i class="fas fa-check"></i> Mark Read
+          </a>
+          {% else %}
+          <a href="{% url 'notification-mark-unread' notification.pk %}" style="text-decoration: none;">
+            <i class="fas fa-undo"></i> Mark Unread
+          </a>
+          {% endif %}
+
+          <form method="post" action="{% url 'notification-delete' notification.pk %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn-danger" onclick="return confirm('Delete this notification?')">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  </div>
+
+  <!-- JavaScript for Toggle Accordion -->
+  <script>
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  function toggleNotification(notificationId) {
+    const content = document.getElementById('notification-content-' + notificationId);
+    const icon = document.getElementById('toggle-icon-' + notificationId);
+    const accordionDiv = content.closest('.notification-accordion');
+    const isUnread = accordionDiv.classList.contains('unread');
+
+    if (content.style.display === 'none' || content.style.display === '') {
+      // Open
+      content.style.display = 'block';
+      icon.innerHTML = '<i class="fas fa-chevron-up"></i>';
+
+      // If notification is unread, mark it as read via AJAX
+      if (isUnread) {
+        const csrftoken = getCookie('csrftoken');
+
+        fetch(`/notifications/${notificationId}/read-ajax/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json',
+          },
+          credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.was_unread) {
+            // Remove unread class to update visual styling
+            accordionDiv.classList.remove('unread');
+
+            // Update unread count in header if it exists
+            const unreadBadge = document.querySelector('.notification-badge');
+            if (unreadBadge) {
+              const currentCount = parseInt(unreadBadge.textContent);
+              if (currentCount > 1) {
+                unreadBadge.textContent = currentCount - 1;
+              } else {
+                unreadBadge.remove();
+              }
+            }
+
+            // Update stats count if on notification page
+            const unreadStat = document.querySelector('.stat-value[style*="color: #6366f1"]');
+            if (unreadStat) {
+              const currentCount = parseInt(unreadStat.textContent);
+              if (currentCount > 0) {
+                unreadStat.textContent = currentCount - 1;
+              }
+            }
+
+            // Update the Mark Read button to Mark Unread
+            const actions = accordionDiv.querySelector('.notification-actions');
+            const markReadLink = actions.querySelector('a[href*="mark-read"]');
+            if (markReadLink) {
+              markReadLink.href = markReadLink.href.replace('/read/', '/unread/');
+              markReadLink.innerHTML = '<i class="fas fa-undo"></i> Mark Unread';
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error marking notification as read:', error);
+        });
+      }
+    } else {
+      // Close
+      content.style.display = 'none';
+      icon.innerHTML = '<i class="fas fa-chevron-down"></i>';
+    }
+  }
+  </script>
+
+  <!-- Pagination -->
+  {% if is_paginated %}
+  <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem;">
+    {% if page_obj.has_previous %}
+    <a href="?page=1" class="btn">First</a>
+    <a href="?page={{ page_obj.previous_page_number }}" class="btn">Previous</a>
+    {% endif %}
+
+    <span style="padding: 0.625rem 1rem;">
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}" class="btn">Next</a>
+    <a href="?page={{ page_obj.paginator.num_pages }}" class="btn">Last</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+{% else %}
+  <div class="notification-empty">
+    <i class="fas fa-bell-slash"></i>
+    <h3>No Notifications</h3>
+    <p>You don't have any notifications yet. We'll notify you about important events.</p>
+  </div>
+{% endif %}
+
+{% endblock %}
+
